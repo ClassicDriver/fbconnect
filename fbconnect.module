@@ -529,6 +529,13 @@ function fbconnect_render_js() {
  */
 function fbconnect_page_alter(&$page) {
   if (facebook_client() && !_fbconnect_is_excluded_page($_GET['q']) && !variable_get('fbconnect_noroot')) {
+    $login_redirect = '';
+    if (empty($GLOBALS['user']->uid)) {
+      // when connecting with your Facebook account as anonymous redirect to
+      // login directly
+      $login_redirect = url('fbconnect/register/create', array('absolute' => TRUE));
+    }
+
     $config = fbconnect_get_config();
     $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
     $page['page_bottom']['fb-init-code'] = array(
@@ -546,7 +553,7 @@ function fbconnect_page_alter(&$page) {
           });
           // whenever the user logs in, we tell our login service
           FB.Event.subscribe(\'auth.login\', function() {
-            window.location.reload();
+            ' . ($login_redirect ? "window.location.replace(\"$login_redirect\")": 'window.location.reload();') . '
           });
           FB.Event.subscribe(\'auth.logout\', function(response) {
             window.location.reload();
