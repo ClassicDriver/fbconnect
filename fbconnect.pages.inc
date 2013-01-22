@@ -306,7 +306,8 @@ function fbconnect_user_identities($form_id, $account) {
   $conf = fbconnect_get_config();
   $current_fbuid = fbconnect_get_fbuid(); // fbuid of currently logged in FB user
   $fbuid = _get_user_fbuid($account->uid); // fbuid of account being edited
-  drupal_set_title(check_plain($account->name));
+  // We don't need the title (no other user category tab displays it)
+  //drupal_set_title(check_plain($account->name));
   $uid = NULL;
   if ($fbuid) {
     $uid = _is_fbconnect_user($fbuid);
