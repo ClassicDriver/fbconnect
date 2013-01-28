@@ -191,6 +191,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     $form_state['values']['status'] = 1;
     $form_state['values']['fb_visible'] = 1;
     $form_state['values']['fb_avatar'] = 1;
+    $form_state['values']['roles'][ACCOUNT_NORMAL_MEMBER_RID] = ACCOUNT_NORMAL_MEMBER_RID;
 
     //to make validation work have to unset some form fields and settings Taxonomy fields cause errors
     //TODO:: check this code sure it will need to check for required profile fields and fill them with data
