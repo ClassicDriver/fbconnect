@@ -410,6 +410,7 @@ function fbconnect_user_settings_form_submit($form, &$form_state) {
 
   $data['data']['fb_visible'] = $form_state['values']['fb_visible'];
   $data['data']['fb_avatar'] = $form_state['values']['fb_avatar'];
+  $data['roles'][ACCOUNT_NORMAL_MEMBER_RID] = 1;
 
   if ($op == $form['fbconnect']['unlink']['#value']) {
     if (fbconnect_unregister($fbuid)) {
