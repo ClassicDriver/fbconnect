@@ -327,6 +327,7 @@ function fbconnect_render_button($attr = array(), $op = null) {
     'size' => $size,
     'background' => 'dark',
     'v' => 3,
+    'onlogin' => 'onLoginEvent();',
   );
 
   $attr = array_merge($default_attr, $attr);
@@ -518,6 +519,7 @@ function fbconnect_render_js() {
       'uid' => $user->uid,
       'fbuid' => @$user->fbuid,
     );
+    $config['register_url'] = url('fbconnect/register/create', array('absolute' => TRUE));
     drupal_add_js(array('fbconnect' => $config), array('type' => 'setting', 'scope' => JS_DEFAULT));
     drupal_add_js($module_path . '/fbconnect.js');
     drupal_add_css($module_path . '/fbconnect.css');
@@ -553,10 +555,17 @@ function fbconnect_page_alter(&$page) {
           });
           // whenever the user logs in, we tell our login service
           FB.Event.subscribe(\'auth.login\', function() {
+            // This function is not always triggered, see onLoginEvent() from fbconnect.js
             ' . ($login_redirect ? "window.location.replace(\"$login_redirect\")": 'window.location.reload();') . '
           });
           FB.Event.subscribe(\'auth.logout\', function(response) {
             window.location.reload();
+          });
+          FB.Event.subscribe(\'auth.statusChange\', function(response) {
+            // This function is not always triggered, see onLoginEvent() from fbconnect.js
+            if (response.authResponse == "connected") { // if login is not fired
+              ' . ($login_redirect ? "window.location.replace(\"$login_redirect\");": 'window.location.reload();') . '
+            }
           });
 
           jQuery(document).trigger(\'fb:init\');
