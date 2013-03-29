@@ -203,6 +203,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     $form_state['values']['fb_visible'] = 1;
     $form_state['values']['fb_avatar'] = 1;
     $form_state['values']['field_account_author_name']['und'][0]['value'] = $data['name'];
+    $form_state['values']['roles'][ACCOUNT_NORMAL_MEMBER_RID] = ACCOUNT_NORMAL_MEMBER_RID;
 
     if (isset($data['location'])) {
       $form_state['values']['field_hometown']['und'][0]['value'] = $data['location']['name'];
@@ -317,7 +318,7 @@ function fbconnect_register_form_submit($form, &$form_state) {
 
   $conf = fbconnect_get_config();
   if ($conf['fast_reg_mode']) {
-    drupal_goto('user');
+    drupal_goto('user/'.$user->uid);
   }
 }
 
@@ -416,6 +417,7 @@ function fbconnect_user_settings_form_submit($form, &$form_state) {
   $account = $form_state['values']['account'];
   $data['data']['fb_visible'] = $form_state['values']['fb_visible'];
   $data['data']['fb_avatar'] = $form_state['values']['fb_avatar'];
+  $data['roles'][ACCOUNT_NORMAL_MEMBER_RID] = 1;
 
   if ($form_state['values']['op'] == $form['unlink']['#value']) {
     if (fbconnect_unregister($account->fbuid)) {

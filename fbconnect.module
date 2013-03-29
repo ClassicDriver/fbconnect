@@ -85,6 +85,10 @@ function fbconnect_block_info() {
     'info' => t('Facebook Login'),
     'cache' => DRUPAL_NO_CACHE,
   );
+  $blocks['fbconnect_login_button_only'] = array(
+    'info' => t('Facebook Login with Image Button only'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
   return $blocks;
 }
 
@@ -102,6 +106,13 @@ function fbconnect_block_view($delta = '') {
       }
       $block['subject'] = t('Facebook Login');
       $block['content'] = fbconnect_render_button();
+    break;
+    case 'fbconnect_login_button_only':
+      if ($user->uid) {
+        return;
+      }
+      $block['subject'] = t('Facebook Login');
+      $block['content'] = theme('fbconnect_login_button_only');
     break;
   }
   return $block;
@@ -128,6 +139,9 @@ function fbconnect_theme() {
         'op' => '',
         'user_profile' => '',
       ),
+    ),
+    'fbconnect_login_button_only' => array(
+      'variables' => array(),
     ),
     'fbconnect_user_profile_tab_connected' => array(
       'variables' => array(
@@ -364,6 +378,7 @@ function fbconnect_render_button($attr = array(), $op = NULL) {
   return theme('fbconnect_login_button', array('text' => $text, 'attr' => $attr, 'op' => $op, 'user_profile' => $user_profile));
 }
 
+
 /**
  * Implements hook_libraries_info().
  */
@@ -554,7 +569,7 @@ function fbconnect_render_js() {
     );
     $facebook = facebook_client();
     $params['scope'] = 'email, user_location, user_about_me';
-    $params['redirect_uri'] = url('fbconnect/register/create', array('absolute' => true));
+    $params['redirect_uri'] = $config['redirect_uri'] = url('fbconnect/register/create', array('absolute' => true));
     $config['oauth_url'] = $facebook->getLoginUrl($params);
     drupal_add_js(array('fbconnect' => $config), array('type' => 'setting', 'scope' => JS_DEFAULT));
     drupal_add_js($module_path . '/fbconnect.js');
@@ -1033,12 +1048,20 @@ function theme_fbconnect_login_button($variables) {
 }
 
 /**
+ * Theme function for Facebook connect/login button.
+ */
+function theme_fbconnect_login_button_only($variables) {
+  return '<div class="facebook_login_button">' . t('Login with Facebook') . '</div>';
+}
+
+/**
  * Implements hook_menu_alter().
  */
 function fbconnect_menu_alter(&$callbacks) {
-  $callbacks['user/%user_category/edit/fbconnect']['page callback'] = 'fbconnect_user_identities';
-  $callbacks['user/%user_category/edit/fbconnect']['module'] = 'fbconnect';
-  $callbacks['user/%user_category/edit/fbconnect']['file'] = 'fbconnect.pages.inc';
+  // Disabled for ClassicDriver
+  // $callbacks['user/%user_category/edit/fbconnect']['page callback'] = 'fbconnect_user_identities';
+  // $callbacks['user/%user_category/edit/fbconnect']['module'] = 'fbconnect';
+  // $callbacks['user/%user_category/edit/fbconnect']['file'] = 'fbconnect.pages.inc';
 }
 
 function _fbconnect_is_excluded_page($path) {

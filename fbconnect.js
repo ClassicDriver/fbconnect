@@ -284,3 +284,19 @@ Drupal.theme.prototype.fbml_profile_pic = function(fbuid, options) {
 };
 
 jQuery(document).bind('fb:init', Drupal.fbconnect.init);
+
+(function ($) {
+  Drupal.behaviors.facebook_login = {
+    attach: function(context, settings){
+      $('.facebook_login_button').click(function(e){
+        e.preventDefault();
+        FB.login(function(response) {
+           if (response.authResponse) {
+             window.location = Drupal.settings.fbconnect.redirect_uri;
+          }
+        }, {scope: 'email,user_location, user_about_me'});
+
+      });
+    }
+   }
+})(jQuery);
