@@ -134,7 +134,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     // The user was not found in the fbconnect_users table, but the
     // email from Facebook might already have an account.
     // Redirect user to the login page with a message..
-    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
+    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'), 'warning');
     $options = array('query' => array(
       'fbconnect' => 'true'
     ));
