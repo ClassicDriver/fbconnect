@@ -202,18 +202,18 @@ function fbconnect_user_delete($account) {
     ->execute();
 }
 
-/**
- * Implements hook_user_categories().
- */
-function fbconnect_user_categories() {
-  return array(
-    array(
-      'name' => 'fbconnect',
-      'title' => 'Facebook',
-      'weight' => 3,
-    ),
-  );
-}
+// /**
+//  * Implements hook_user_categories().
+//  */
+// function fbconnect_user_categories() {
+//   return array(
+//     array(
+//       'name' => 'fbconnect',
+//       'title' => 'Facebook',
+//       'weight' => 3,
+//     ),
+//   );
+// }
 
 /**
  *  Redirects the user to the account linking page.
