@@ -100,7 +100,7 @@ function fbconnect_login_page($form, $form_state = array()) {
   elseif ( _email_already_exist($data['email'])) {
     // The user was not found in the fbconnect_users table, but the emial from Facebook might already have an account on coracle.
     // Redirect user to the login page with a message.
-    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
+    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'), 'warning');
     $options = array('query' => array(
       'fbconnect' => 'true'
     ));
