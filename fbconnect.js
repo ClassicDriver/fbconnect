@@ -284,19 +284,3 @@ Drupal.theme.prototype.fbml_profile_pic = function(fbuid, options) {
 };
 
 jQuery(document).bind('fb:init', Drupal.fbconnect.init);
-
-/**
- * Fix redirect when auth.login event is not triggered
- *
- * Also modified: fbconnect.module
- *  - fbconnect_render_button(): added onLogin attribute
- *  - fbconnect_render_js(): added register_url value
- */
-function onLoginEvent() {
-  if ( Drupal.settings.fbconnect.user.uid == 0 // User is not logged in
-    && Drupal.settings.fbconnect.fbuid  // User is logged in on Facebook and authorized the application
-    && Drupal.settings.fbconnect.fast_reg_mode == 1 // Fast registration enabled
-  ) {
-    window.location.replace(Drupal.settings.fbconnect.register_url);
-  }
-}

@@ -1,3 +1,6 @@
+2012-03-26
+  Please see commit log for changes.
+
 2010/11
  - Removed fbconnect_fb_social submodule due to #852582 (temporary available at http://github.com/downloads/vectoroc/fbconnect/fbconnect_fb_social.zip)
 
@@ -20,7 +23,7 @@
   - Some more use of t() Function
   - Make Fbconnect user picture override themeable
   - Add Flag for hte use of Facebooks user picture
-  - extends admin interface with a textfield to enter own text for facebook connect button and changed the fbconnect_render_button function as well
+  - extends admin interface with a textfield to enter own text for Facebook connect button and changed the fbconnect_render_button function as well
 
 2009/11/26 - vectoroc
   - Extend users.mail field upto 320 chars to support proxied_mail in fast registration mode (monkey patch)

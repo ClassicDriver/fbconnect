@@ -7,7 +7,7 @@
 
 /**
  * Menu callback.
- * Called when user perform facebook registration
+ * Called when user perform Facebook registration
  */
 function fbconnect_prompt_page() {
   $conf = fbconnect_get_config();
@@ -84,55 +84,55 @@ function fbconnect_prompt_page_links() {
 function fbconnect_login_page($form, $form_state = array()) {
   $conf = fbconnect_get_config();
   $data = fbconnect_get_user_info(array('name', 'email'));
-  // User not logged into facebook we dont have any information for them, let them log in.
+  // User not logged into Facebook we dont have any information for them, let them log in.
   if (empty($data)) {
       return facebook_login_page($form, $form_state);
   }
-  // Check if user has already registered with their facebook account.
+  // Check if user has already registered with their Facebook account.
   $user_id = _is_fbconnect_user($data['id']);
   if ($user_id) {
-    // User allready registered facebook account to site, log them in
+    // User already registered Facebook account to site, log them in
     $form_state['uid'] = $user_id;
     user_login_submit($form, $form_state);
-    drupal_set_message('You have been successfully logged in.');
+    drupal_set_message(t('You have been successfully logged in.'));
     drupal_goto('user/' . $user_id);
   }
-  elseif ( _email_allready_exist($data['email'])) {
-    // The user was not found in the fbconnect_users table, but the emial from facebook might allready have an account on coracle.
+  elseif ( _email_already_exist($data['email'])) {
+    // The user was not found in the fbconnect_users table, but the emial from Facebook might already have an account on coracle.
     // Redirect user to the login page with a message.
-    drupal_set_message(t('This email address is allready registered to an account. Please log in to this account with the username and password provided during registration'));
+    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
       'fbconnect' => 'true'
     ));
     drupal_goto('user/login', $options);
   }
   else {
-    drupal_set_message('You do not have an account with this site. Create an account on this site with through facebook !here', array('!here' => l('fbconnect/register/create')));
+    drupal_set_message(t('You do not have an account with this site. Create an account on this site with through Facebook <a href="!here">here</a>'), array('!here' => url('fbconnect/register/create')));
   }
 
 }
 
 /**
  * Menu callback.
- * Called when user perform facebook registration
+ * Called when user perform Facebook registration
  */
 function fbconnect_register_page($form, $form_state = array()) {
   $conf = fbconnect_get_config();
-  $data = fbconnect_get_user_info(array('name', 'email'));
-  // User not logged into facebook we dont have any information for them, let them log in.
+  $data = fbconnect_get_user_info(array('name', 'email', 'location', 'bio'));
+  // User not logged into Facebook we dont have any information for them, let them log in.
   if (empty($data)) {
     return facebook_login_page($form, $form_state);
   }
-  // Check if user has allready registered with thier facebook account
+  // Check if user has already registered with thier Facebook account
   $uid = _is_fbconnect_user($data['id']);
   if ($uid) {
-    // User already registered facebook account to site, log them in
+    // User already registered Facebook account to site, log them in
     $form_state['uid'] = $uid;
     user_login_submit($form, $form_state);
   }
-  elseif (_email_allready_exist($data['email'])) {
+  elseif (_email_already_exist($data['email'])) {
     // The user was not found in the fbconnect_users table, but the
-    // email from facebook might already have an account.
+    // email from Facebook might already have an account.
     // Redirect user to the login page with a message..
     drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
@@ -152,10 +152,21 @@ function fbconnect_register_page($form, $form_state = array()) {
     return;
   }
 
-  $form['account']['name']['#value'] = empty($form_state['input']['name']) ? $data['name'] : $form_state['input']['name'];
+  $form['account']['name']['#type'] = 'hidden';
+  $form['account']['name']['#value'] = user_password();
   $form['account']['mail']['#parents'] = array('name');
   $form['account']['mail']['#value'] = $data['email'];
   $form['account']['mail']['#parents'] = array('mail');
+
+  $form['field_account_author_name']['und'][0]['value']['#default_value'] = $data['name'];
+
+  if (isset($data['location'])) {
+    $form['field_hometown']['und'][0]['value']['#default_value'] = $data['location']['name'];
+  }
+
+  if (isset($data['bio'])) {
+    $form['field_account_author_box']['und'][0]['value']['#default_value'] = $data['bio'];
+  }
 
   $form['fbconnect'] = array(
     '#type' => 'fieldset',
@@ -172,7 +183,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     $form['fbconnect']['fb_avatar'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use my Facebook picture as user picture'),
-      '#description' => t('Your picture will be loaded from facebook.'),
+      '#description' => t('Your picture will be loaded from Facebook.'),
       '#default_value' => 1,
     );
   }
@@ -185,22 +196,30 @@ function fbconnect_register_page($form, $form_state = array()) {
   if ($conf['fast_reg_mode']) {
     $newname = $conf['fast_reg_autoname']? _fbconnect_get_username($data['name']) : $data['name'];
     //drupal_set_message('new name : ' . $newname);
-    $form_state['values']['name'] = $newname;
+    $form_state['values']['name'] = user_password();
     $form_state['values']['mail'] = $data['email'];
     $form_state['values']['pass'] = user_password();
     $form_state['values']['status'] = 1;
     $form_state['values']['fb_visible'] = 1;
     $form_state['values']['fb_avatar'] = 1;
-    $form_state['values']['roles'][ACCOUNT_NORMAL_MEMBER_RID] = ACCOUNT_NORMAL_MEMBER_RID;
+    $form_state['values']['field_account_author_name']['und'][0]['value'] = $data['name'];
+
+    if (isset($data['location'])) {
+      $form_state['values']['field_hometown']['und'][0]['value'] = $data['location']['name'];
+    }
+
+    if (isset($data['bio'])) {
+      $form_state['values']['field_account_author_box']['und'][0]['value'] = $data['bio'];
+    }
 
     //to make validation work have to unset some form fields and settings Taxonomy fields cause errors
     //TODO:: check this code sure it will need to check for required profile fields and fill them with data
     foreach ($form as $key => $val) {
-        //unset all cusom fields
-        if (strstr($key, 'field_')) {
-            //unset this custom field
-            unset($form[$key]);
-        }
+      //unset all cusom fields
+      if (strstr($key, 'field_')) {
+        //unset this custom field
+        unset($form[$key]);
+      }
     }
     $form_state['complete form'] = $form;
     //taxonomy linked fields causes issues with this validate form function
@@ -227,11 +246,13 @@ function fbconnect_register_page($form, $form_state = array()) {
 
 function facebook_login_page(&$form, $form_state = array()) {
     $facebook = facebook_client();
-    $params['scope'] = 'email';
+    $params['scope'] = 'email, user_location, user_about_me';
+    $params['redirect_uri'] = url('fbconnect/register/create', array('absolute' => true));
     $login_url = $facebook->getLoginUrl($params);
+    drupal_goto($login_url);
     $form['log_in_to_facebook'] = array(
       '#title' => t('You must login to Facebook AND give the site access to use this feature'),
-      '#description' => t('Log in using your facebook account'),
+      '#description' => t('Log in using your Facebook account'),
       '#type' => 'item',
       '#markup' => l(t('Login using your Facebook account'), $login_url),
     );
@@ -258,14 +279,14 @@ function _fbconnect_get_username($name_suggestion) {
 
 function fbconnect_register_form_validate($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
-  //make sure we have a facebook user object by the time we get here otherwise drop form and exit with error message
+  // Make sure we have a Facebook user object by the time we get here otherwise
+  // drop form and exit with error message.
   if ($fbuid == 0) {
-    $msg = t('You are not logged into facebook log into facebook and try again.');
-    drupal_set_message($msg, 'error');
-    watchdog('fbconnect', $msg);
+    drupal_set_message(t('You are not logged into Facebook. Log into Facebook and try again.'), 'error');
     drupal_goto();
   }
 }
+
 function fbconnect_register_form_submit($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
   if (_is_fbconnect_user($fbuid)) {
@@ -307,15 +328,14 @@ function fbconnect_user_identities($form_id, $account) {
   $conf = fbconnect_get_config();
   $current_fbuid = fbconnect_get_fbuid(); // fbuid of currently logged in FB user
   $fbuid = _get_user_fbuid($account->uid); // fbuid of account being edited
-  // We don't need the title (no other user category tab displays it)
-  //drupal_set_title(check_plain($account->name));
+  drupal_set_title(check_plain($account->name));
   $uid = NULL;
   if ($fbuid) {
     $uid = _is_fbconnect_user($fbuid);
     $account->fbuid = $fbuid;
   }
   if (!$uid && !empty($current_fbuid)) {
-    // We have facebook access for this user but we dont have the user in the fbconnect_users table, add him.
+    // We have Facebook access for this user but we dont have the user in the fbconnect_users table, add him.
     fbconnect_register($account->uid, $current_fbuid);
     $uid = _is_fbconnect_user($current_fbuid);
   }
@@ -331,29 +351,29 @@ function fbconnect_user_identities($form_id, $account) {
 }
 
 /**
- *  This form allows the user to manage their facebook connect settings.
+ *  This form allows the user to manage their Facebook connect settings.
  *
- *  Some options are visible only if facebook session is active.
+ *  Some options are visible only if Facebook session is active.
  */
 function fbconnect_user_settings_form($form, $form_state, $account) {
   $conf = fbconnect_get_config();
   // These fields manage the visibility of the user,
-  // if the option is enabled, user's facebook friends
+  // if the option is enabled, user's Facebook friends
   // will be able to see his presence on this site
   $form['fb_visible'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'value',
     '#title' => t('Let my Facebook friends see me on @site', array('@site' => $conf['invite_name'])),
     '#description' => t('My Facebook friends will be able to see that I own an account on this website.'),
     '#default_value' => isset($account->data['fb_visible']) ? $account->data['fb_visible'] : NULL,
   );
 
   // Whether user picture is enabled,
-  // users can choose to use his facebook avatar as avatar
+  // users can choose to use his Facebook avatar as avatar
   if ($conf['user_pictures'] == 'allow') {
     $form['fb_avatar'] = array(
-      '#type' => 'checkbox',
+      '#type' => 'value',
       '#title' => t('Use my Facebook picture as user picture'),
-      '#description' => t('Your picture will be loaded from facebook.'),
+      '#description' => t('Your picture will be loaded from Facebook.'),
       '#default_value' => isset($account->data['fb_avatar']) ? $account->data['fb_avatar'] : NULL,
     );
   }
@@ -372,30 +392,20 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
     '#value' => $account,
   );
 
-  $form['fbconnect'] = array(
-    '#title' => t('Facebook account'),
-    '#type' => 'fieldset',
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
 
-  $form['fbconnect']['profile'] = array(
+  $form['profile'] = array(
     '#type' => 'item',
     '#title' => t('Linked to this Facebook account'),
     '#markup' => '<fb:name uid="' . $account->fbuid . '" useyou="false" linked="true"></fb:name>',
   );
 
-  $form['fbconnect']['unlink'] = array(
+  $form['unlink'] = array(
     '#type' => 'submit',
     '#description' => t('Click here to unlink this Facebook account'),
     '#value' => t('Unlink'),
     '#access' => !!facebook_client(), // don't show unlink button if fbconnect is'nt properly configured
   );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save settings'),
-  );
   return $form;
 }
 
@@ -404,33 +414,26 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
  */
 function fbconnect_user_settings_form_submit($form, &$form_state) {
   $account = $form_state['values']['account'];
-  //$visible = $form_state['values']['visibility'];
-  $avatar = $form_state['values']['fb_avatar'];
-  $op = $form_state['values']['op'];
-  $fbuid = $account->fbuid;
-
   $data['data']['fb_visible'] = $form_state['values']['fb_visible'];
   $data['data']['fb_avatar'] = $form_state['values']['fb_avatar'];
-  $data['roles'][ACCOUNT_NORMAL_MEMBER_RID] = 1;
 
-  if ($op == $form['fbconnect']['unlink']['#value']) {
-    if (fbconnect_unregister($fbuid)) {
-      $data['data']['fb_visible'] = NULL;
-      $data['data']['fb_avatar'] = NULL;
+  if ($form_state['values']['op'] == $form['unlink']['#value']) {
+    if (fbconnect_unregister($account->fbuid)) {
+      unset($data);
     }
     else {
       form_set_error('fbconnect', t("Something went wrong. Can't unlink account"));
     }
   }
 
-  if ($data) {
+  if (isset($data)) {
     user_save($account, $data);
   }
   drupal_set_message(t('Your configuration options have been saved.'));
 }
 
 /**
- * Make rendering of facebook user picture themeable
+ * Make rendering of Facebook user picture themeable
  */
 function theme_fbconnect_user_picture_override($variables) {
   $fbuid = $variables['fbuid'];
@@ -445,7 +448,7 @@ function theme_fbconnect_user_picture_override($variables) {
 
 
 /**
- * Make rendering of facebook user profile tab themable
+ * Make rendering of Facebook user profile tab themable
  */
 function theme_fbconnect_user_profile_tab_connected($variables) {
   $account = $variables['account'];

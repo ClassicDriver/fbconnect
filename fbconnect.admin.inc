@@ -25,7 +25,7 @@ function fbconnect_api_keys_settings($form, &$form_state) {
   $form['fbconnect_language_code'] = array(
     '#type' => 'textfield',
     '#title' => (module_exists('i18n')) ? t('Default language code') : t('Language code'),
-    '#description' => t('Enter your country code here to get translated versions of facebook connect. (e.g. en_US or de_DE)'),
+    '#description' => t('Enter your country code here to get translated versions of Facebook connect. (e.g. en_US or de_DE)'),
     '#default_value' => variable_get('fbconnect_language_code', 'en_US'),
   );
 
@@ -53,6 +53,12 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#title' => t('Debug mode'),
     '#default_value' => variable_get('fbconnect_debug', FALSE),
   );
+  $form['fbconnect_ssl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Always use SSL on authentication'),
+    '#description' => t('Enable this if you want to use SSL on authentication.'),
+    '#default_value' => variable_get('fbconnect_ssl', FALSE),
+  );
 
   $form['fbconnect_connect_url'] = array(
     '#type' => 'textfield',
@@ -61,12 +67,12 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#default_value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
   );
 
-   $form['fbconnect_noroot'] = array(
-     '#title' => t("Don't include settings in footer"),
-     '#type' => 'checkbox',
-     '#description' => t('Check if other facebook modules are in use so fb-root code is not added twice.'),
-     '#default_value' => variable_get('fbconnect_noroot', '')
-   );
+  $form['fbconnect_noroot'] = array(
+    '#title' => t("Don't include settings in footer"),
+    '#type' => 'checkbox',
+    '#description' => t('Check if other Facebook modules are in use so fb-root code is not added twice.'),
+    '#default_value' => variable_get('fbconnect_noroot', '')
+  );
 
   //  locale
   //  connect_logo_url
@@ -106,7 +112,7 @@ function fbconnect_appearance_settings($form, &$form_state) {
       'auto'   => t('Auto login/logout'),
     ),
     '#default_value' => variable_get('fbconnect_loginout_mode', FALSE),
-    '#description' => t("Login to Drupal/logout from facebook. Enable this if you don't want to logout automatically from facebook."),
+    '#description' => t("Login to Drupal/logout from Facebook. Enable this if you don't want to logout automatically from Facebook."),
   );
 
   // TODO: rename to more clear name
@@ -115,6 +121,21 @@ function fbconnect_appearance_settings($form, &$form_state) {
     '#title' => t('Disable linking accounts during registration'),
     '#default_value' => variable_get('fbconnect_reg_options', 0),
     '#description' => t('Disables the option to link local account to a FB account on registration'),
+  );
+  $form['site']['fbconnect_user_reg_display'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display FBConnect button on registration form'),
+    '#default_value' => variable_get('fbconnect_user_reg_display', TRUE),
+    '#description' => t('Add the FBConnect button to the "create new account" form. This will only appear if "fast registration mode" is not selected.'),
+  );
+  $form['site']['fbconnect_user_reg_location'] = array(
+    '#type'=> 'select',
+    '#title' => t('Location of FBConnect button on registration form'),
+    '#default_value' => variable_get('fbconnect_user_reg_location', 'top'),
+    '#options' => array(
+      'top' => t('Top'),
+      'bottom' => t('Bottom'),
+    ),
   );
 
   $form['display'] = array(
@@ -158,11 +179,11 @@ function fbconnect_appearance_settings($form, &$form_state) {
   $form['display']['fbconnect_pic_allow'] = array(
     '#type' => 'select',
     '#title' => t('Facebook picture settings'),
-    '#description' => t('Here you can deside whether you want to allow the use of the facebook picture - or not.'),
+    '#description' => t('Here you can deside whether you want to allow the use of the Facebook picture - or not.'),
     '#default_value' => variable_get('fbconnect_pic_allow', 'allow'),
     '#options' => array(
       'allow' => t('Let the user choose'),
-      'disallow' => t('Do not allow the use of facebook user picture at your site'),
+      'disallow' => t('Do not allow the use of Facebook user picture at your site'),
     ),
   );
 
@@ -176,7 +197,7 @@ function fbconnect_appearance_settings($form, &$form_state) {
   $form['display']['fbconnect_pic_size'] = array(
     '#type' => 'select',
     '#title' => t('Default Facebook picture size'),
-    '#description' => t('This will set the default user picture size throughout the site. If your user decides to use his facebook picture, choose its size here.'),
+    '#description' => t('This will set the default user picture size throughout the site. If your user decides to use his Facebook picture, choose its size here.'),
     '#default_value' => variable_get('fbconnect_pic_size', 'square'),
     '#options' => $options_pic_size,
   );
@@ -184,21 +205,21 @@ function fbconnect_appearance_settings($form, &$form_state) {
   $form['display']['fbconnect_pic_size_nodes'] = array(
     '#type' => 'select',
     '#title' => t('Node Facebook picture size'),
-    '#description' => t('This will set the picture size when viewing a node post. If your user decides to use his facebook picture, choose its size here.'),
+    '#description' => t('This will set the picture size when viewing a node post. If your user decides to use his Facebook picture, choose its size here.'),
     '#default_value' => variable_get('fbconnect_pic_size_nodes', 'square'),
     '#options' => $options_pic_size,
   );
   $form['display']['fbconnect_pic_size_comments'] = array(
     '#type' => 'select',
     '#title' => t('Comments Facebook picture size'),
-    '#description' => t('This will set the picture size when viewing a comment post. If your user decides to use his facebook picture, choose its size here.'),
+    '#description' => t('This will set the picture size when viewing a comment post. If your user decides to use his Facebook picture, choose its size here.'),
     '#default_value' => variable_get('fbconnect_pic_size_comments', 'square'),
     '#options' => $options_pic_size,
   );
   $form['display']['fbconnect_pic_size_profile'] = array(
     '#type' => 'select',
     '#title' => t('Profile Facebook picture size'),
-    '#description' => t("This will set the picture size when viewing a user's profile page. If your user decides to use his facebook picture, choose its size here."),
+    '#description' => t("This will set the picture size when viewing a user's profile page. If your user decides to use his Facebook picture, choose its size here."),
     '#default_value' => variable_get('fbconnect_pic_size_profile', 'small'),
     '#options' => $options_pic_size,
   );
@@ -236,7 +257,7 @@ function fbconnect_fbapp_settings($form, &$form_state) {
   if (!fbconnect_get_fbuid()) {
     $button_attr = array('text' => t('Connect with your Facebook account'));
     $form['fbconnect'] = array(
-      '#prefix' => '<div>' . t('You are not connected to the facebook account that this application is registered to') . '</div>',
+      '#prefix' => '<div>' . t('You are not connected to the Facebook account that this application is registered to') . '</div>',
       '#markup' => fbconnect_render_button($button_attr),
     );
     return $form;
@@ -278,7 +299,7 @@ function fbconnect_fbapp_settings_submit($form, &$form_state) {
   );
 
   if (!facebook_client()) {
-    drupal_set_message(t('Unable to get a facebook client, check your api key'), 'error');
+    drupal_set_message(t('Unable to get a Facebook client, check your api key'), 'error');
     return FALSE;
   }
   if (!fbconnect_get_fbuid()) {
@@ -296,10 +317,10 @@ function fbconnect_fbapp_settings_submit($form, &$form_state) {
     drupal_set_message(t('Exception thrown while using admin_setAppProperties : @code', array('@code' => $e->getMessage())), 'error');
   }
   if (!$res) {
-    drupal_set_message(t('Checking your facebook session, you are not allowed to change this application settings'), 'error');
+    drupal_set_message(t('Checking your Facebook session, you are not allowed to change this application settings'), 'error');
   }
   else {
-    drupal_set_message(t('Your facebook app settings has been updated'));
+    drupal_set_message(t('Your Facebook app settings has been updated'));
   }
 }
 
