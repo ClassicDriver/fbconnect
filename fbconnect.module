@@ -166,6 +166,9 @@ function fbconnect_theme() {
  * Implements hook_init().
  */
 function fbconnect_init() {
+  if (arg(0) != "user" && (arg(1) != "register" || arg(1) != "login")) {
+      return;
+  }
   fbconnect_render_js();
   $conf = fbconnect_get_config();
   if ($conf && facebook_client() && user_is_anonymous()) {
