@@ -595,6 +595,7 @@ function fbconnect_page_alter(&$page) {
     $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
     $page['page_bottom']['fb-init-code'] = array(
       '#type' => 'markup',
+      '#weight' => -9999,
       '#markup' => '<div id="fb-root"></div>
       <script type="text/javascript">
         window.fbAsyncInit = function() {
@@ -614,6 +615,7 @@ function fbconnect_page_alter(&$page) {
             window.location.reload();
           });
 
+          console.log(123);
           jQuery(document).trigger(\'fb:init\');
         };
 
@@ -625,6 +627,18 @@ function fbconnect_page_alter(&$page) {
         }());
       </script>'
     );
+
+    // FBConnect module is incompatible with Drupal For Facebook (fb)
+    // So remove fb script when fbconnect is enabled
+    if (!empty($page['page_bottom']['fb'])) {
+      // remove bottom <scripts>
+      unset($page['page_bottom']['fb']);
+
+      $js = &drupal_static('drupal_add_js', array());
+      if (isset($js['sites/all/modules/fb/fb.js'])) {
+        unset($js['sites/all/modules/fb/fb.js']);
+      }
+    }
   }
 }
 
@@ -1091,4 +1105,3 @@ function fbconnect_user_logout() {
     drupal_goto($url);
   }
 }
-
