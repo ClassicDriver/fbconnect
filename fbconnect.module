@@ -628,15 +628,6 @@ function fbconnect_page_alter(&$page) {
       </script>'
     );
 
-    function get_site_protocol(){
-      if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
-        $protocol = 'https://';
-      } else {
-        $protocol = 'http://';
-      }
-      return $protocol;
-    }
-
     // FBConnect module is incompatible with Drupal For Facebook (fb)
     // So remove fb script when fbconnect is enabled
     if (!empty($page['page_bottom']['fb'])) {
@@ -649,6 +640,15 @@ function fbconnect_page_alter(&$page) {
       }
     }
   }
+}
+
+function get_site_protocol(){
+  if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+    $protocol = 'https://';
+  } else {
+    $protocol = 'http://';
+  }
+  return $protocol;
 }
 
 /**
