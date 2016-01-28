@@ -592,7 +592,7 @@ function fbconnect_page_alter(&$page) {
       $login_redirect = url('fbconnect/register/create', array('absolute' => TRUE));
     }
     $config = fbconnect_get_config();
-    $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
+    $channel_uri = preg_replace("@'@msi", "\'", get_site_protocol() . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
     $page['page_bottom']['fb-init-code'] = array(
       '#type' => 'markup',
       '#weight' => -9999,
@@ -627,6 +627,15 @@ function fbconnect_page_alter(&$page) {
         }());
       </script>'
     );
+
+    function get_site_protocol(){
+      if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+        $protocol = 'https://';
+      } else {
+        $protocol = 'http://';
+      }
+      return $protocol;
+    }
 
     // FBConnect module is incompatible with Drupal For Facebook (fb)
     // So remove fb script when fbconnect is enabled
